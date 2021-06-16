@@ -1,4 +1,6 @@
 #include "Play_Persist.h"
+#include "Play.h"
+#include <stdio.h>
 
 /*
 标识符：TTMS_SCU_Play_Perst_SelAll
@@ -19,7 +21,7 @@ int Play_Perst_SelectAll(play_list_t list)
 		return 0;
 	}
 	
-	while(feof(fp) != NULL)
+	while(!feof(fp))
 	{
 		fread(&newNode, sizeof(play_node_t), 1, fp);
 		List_AddTail(list, newNode);
@@ -41,7 +43,7 @@ int Play_Perst_Insert(play_t *data)
 	int rtn;
 	
 	data->id = EntKey_Perst_GetNewKeys(data->name, 1);
-	id(data->id == 0)
+	if(data->id == 0)
 	{
 		printf("获取主键失败\n");
 		return -1;
@@ -79,7 +81,7 @@ int Play_Perst_Update(const play_t *data)
 		return found;
 	}
 	
-	while(feof(fp) != NULL)
+	while(!feof(fp))
 	{
 		fread(&buf, sizeof(buf), 1, fp);
 		if(buf.id == data->id)
@@ -92,4 +94,66 @@ int Play_Perst_Update(const play_t *data)
 	}
 	
 	return found;
+}
+
+/*
+标识符：TTMS_SCU_Play_Perst_RemByID
+函数功能：删除Play.dat中指定ID的剧目信息
+参数说明: id为待删除剧目id
+返回值：返回1b=表示成功，否则失败
+*/ 
+int Play_Perst_RemByID(int id)
+{
+	FILE *fp1;
+	FILE *fp2;
+	play_t buf;
+	fp1 = fopen("Play.dat", "rb");
+	fp2 = fopen("PlayTmp.dat", "wba");
+	if(fp1 == NULL)
+	{
+		printf("文件Play.dat打开失败\n");
+		return -1;
+	}
+	
+	while(!feof(fp1))
+	{
+		fread(&buf, sizeof(buf), 1, fp1);
+		if(buf.id != id)
+			fwrite(&buf, sizeof(buf), 1, fp2);
+	}
+	
+	remove("Play.dat");
+	rename("PlayTmp.dat", "Play.dat");
+	return 1;
+}
+
+/*
+标识符；TTMS_SCU_Play_Perst_SelByID
+函数功能：在文件Play.dat中载入指定id的信息加载到buf中
+参数说明：id为载入剧目id,buf存放id的信息
+返回值: 1表示成功，否则失败
+*/ 
+int Play_Perst_SelectByID(int id, play_t *buf)
+{
+	FILE *fp;
+	play_t data;
+	
+	fp = fopen("Play.dat", "rb");
+	if(fp == NULL)
+	{
+		printf("文件Play.dat打开失败\n");
+		return -1;
+	}
+	
+	while(!feof(fp))
+	{
+		fread(&data, sizeof(data), 1, fp);
+		if(id == data.id)
+		{
+			buf = &data;
+			return 1;
+		}
+	}
+	
+	return 0;
 }
