@@ -40,7 +40,7 @@ typedef struct play_node{
 
 //标识符：TTMS_SCU_Play_UI_MgtEnt
 //函数功能：显示管理剧目界面
-int Play_UI_MgtEntry(void);
+void Play_UI_MgtEntry(void);
 
 
 //标识符：TTMS_SCU_Play_UI_Add
