@@ -1,6 +1,7 @@
 #include "Play_UI.h"
-#include "../Service/Play.h"
+#include "../service/Play.h"
 #include "../Common/List.h"
+#include "Schedule_UI.h"
 #include <stdio.h>
 
 /*
@@ -29,7 +30,7 @@ void Play_UI_MgtEntry(void)
 	{
 
 		system("cls"); 
-		if(num == 0)
+		if(paging.totalRecords == 0)
 			printf("暂无记录\n");
 		else
 		{
@@ -73,13 +74,13 @@ void Play_UI_MgtEntry(void)
 			printf("========================共 %d 项 ============================== 第 %d/%d 页 ================================\n",paging.totalRecords, Pageing_CurPage(paging),Pageing_TotalPages(paging));
 		}
 		
-		printf("1.显示上一页(p/P)\n");
-		printf("2.显示下一页(n/N)\n");
-		printf("3.添加新剧目(a/A)\n");
-		printf("4.修改剧目(u/U)\n");
-		printf("5.删除剧目(d/D)\n");
-		printf("6.安排演出(s/S)\n");
-		printf("7.退出(r/R)\n");
+		printf("[p/P]显示上一页\n");
+		printf("[n/N]显示下一页\n");
+		printf("[a/A]添加新剧目\n");
+		printf("[u/U]修改剧目\n");
+		printf("[d/D]删除剧目\n");
+		printf("[s/S]安排演出\n");
+		printf("[r/R]退出\n");
 		printf("---------------------------------------\n");
 		printf("输入相应字母："); 
 		fflush(stdin);
@@ -92,7 +93,7 @@ void Play_UI_MgtEntry(void)
 					List_Init(head, play_node_t);
 					paging.totalRecords = Play_Srv_FetchAll(head);
 					List_Paging(head, paging, play_node_t);
-					Paging_Locate_LastPage(head, paging, play_node_t)
+					Paging_Locate_LastPage(head, paging, play_node_t);
 				}	
 		}else if((choice == 'u') || (choice == 'U'))
 		{
@@ -109,11 +110,14 @@ void Play_UI_MgtEntry(void)
 			printf("输入剧目id:");
 			scanf("%d", &id);
 			if (Play_UI_Delect(id))
-				{
-					List_Init(head, play_node_t);
-					paging.totalRecords = Play_Srv_FetchAll(head);
-					List_Paging(head, paging, play_node_t);
-				}
+			{
+				printf("删除成功\n");
+				List_Init(head, play_node_t);
+				paging.totalRecords = Play_Srv_FetchAll(head);
+				List_Paging(head, paging, play_node_t);
+			}
+			else
+				printf("删除失败\n");
 		}else if((choice == 'p') || (choice == 'P'))
 		{
 			if(!Pageing_IsFirstPage(paging))
@@ -134,12 +138,12 @@ void Play_UI_MgtEntry(void)
 				printf("无法跳转\n");
 		}else if((choice == 's') || (choice == 'S'))
 		{
-			/*printf("输入剧目id:");
+			printf("输入剧目id:");
 			scanf("%d", &id);
 			if(Play_Srv_FetchByID(id, &buf) == 0)
 				printf("该剧目id不存在\n");
 			else
-				Schedule_UI_MgtEntry(id);*/
+				Schedule_UI_MgtEntry(id);
 		}else if((choice == 'r') || (choice == 'R'))
 			break;
 	}while(1);
@@ -165,20 +169,32 @@ int Play_UI_Add(void)
         printf("输入剧目名称：");
         scanf("%s", data.name);
         printf("--------------------\n");
-        printf("1.电影\n");
-        printf("2.歌剧\n");
-        printf("3.音乐会\n");
-        printf("--------------------\n");
-        printf("选择剧目类型:");
-        scanf("%d", &data.type);
+        while(1)
+        {
+	        printf("1.电影\n");
+	        printf("2.歌剧\n");
+	        printf("3.音乐会\n");
+	        printf("--------------------\n");
+	        printf("选择剧目类型:");
+	        scanf("%d", &data.type);
+	        if(data.type <= 3 && data.type >= 1)
+		        break;
+	   }
         printf("输入剧目出品地区:");
         scanf("%s", data.area);
         printf("--------------------\n");
-        printf("1.适合儿童\n");
-        printf("2.适合青少年\n");
-        printf("3.适合成人\n");
-        printf("--------------------\n");
-        printf("选择剧目等级：");
+        while(1)
+    	{
+	        printf("--------------------\n");
+	        printf("1.适合儿童\n");
+	        printf("2.适合青少年\n");
+	        printf("3.适合成人\n");
+	        printf("--------------------\n");
+	        printf("选择新的剧目等级：");
+	        scanf("%d", &data.rating); 
+	        if(data.rating <= 3 && data.rating >= 1)
+	        	break;
+        }
         scanf("%d", &data.rating);
 		printf("输入剧目时长(以分钟为单位,输入数字):");
 		scanf("%d",&data.duration); 
@@ -201,8 +217,8 @@ int Play_UI_Add(void)
         while(1)
         {
             printf("----------------------\n");
-            printf("1.继续添加(a/A)\n");
-            printf("2.返回(r/R)\n");
+            printf("[a/A]继续添加\n");
+            printf("[r/R]返回\n");
             printf("----------------------\n");
             printf("输入相应字母:");
             fflush(stdin);
@@ -268,40 +284,51 @@ int Play_UI_Modify(int id)
     if((choice == 'n') || (choice == 'N'))
     {
         printf("输入新的剧目名称:");
+        memset(buf.name, 0, sizeof(buf.name));
         scanf("%s", buf.name);
     }else if((choice == 't') || (choice == 'T'))
     {
-    	printf("--------------------\n");
-        printf("1.电影\n");
-        printf("2.歌剧\n");
-        printf("3.音乐会\n");
-        printf("--------------------\n");
-        printf("选择新的剧目类型:");
-        scanf("%d", &buf.type);
+        while(1)
+        {
+	        printf("1.电影\n");
+	        printf("2.歌剧\n");
+	        printf("3.音乐会\n");
+	        printf("--------------------\n");
+	        printf("选择剧目类型:");
+	        scanf("%d", &buf.type);
+	        if(buf.type <= 3 && buf.type >= 1)
+		        break;
+	   }
     }else if((choice == 'a') || (choice == 'A'))
     {
         printf("输入新的剧目出品地区:");
+        memset(buf.area, 0, sizeof(buf.area));
         scanf("%s", buf.area);
     }else if((choice == 'r') || (choice == 'R'))
     {
-        printf("--------------------\n");
-        printf("1.适合儿童\n");
-        printf("2.适合青少年\n");
-        printf("3.适合成人\n");
-        printf("--------------------\n");
-        printf("选择新的剧目等级：");
-        scanf("%d", &buf.rating); 
+    	while(1)
+    	{
+	        printf("--------------------\n");
+	        printf("1.适合儿童\n");
+	        printf("2.适合青少年\n");
+	        printf("3.适合成人\n");
+	        printf("--------------------\n");
+	        printf("选择新的剧目等级：");
+	        scanf("%d", &buf.rating); 
+	        if(buf.rating <= 3 && buf.rating >= 1)
+	        	break;
+        }
     }else if((choice == 'd') || (choice == 'D'))
     {
         printf("输入新的时长：");
         scanf("%d", &buf.duration); 
     }else if((choice == 's') || (choice == 'S'))
     {
-		printf("输入新的开始放映日期(如2020 2 22):");
+		printf("输入新的开始放映日期(如2021 10 22):");
 		scanf("%d %d %d",&buf.start_date.year,&buf.start_date.month,&buf.start_date.day); 
     }else if((choice == 'e') || (choice == 'E'))
     {
-		printf("输入新的放映结束日期(如2020 2 22):");
+		printf("输入新的放映结束日期(如2021 10 22):");
 		scanf("%d %d %d",&buf.end_date.year,&buf.end_date.month,&buf.end_date.day);
     }else if((choice == 'p') || (choice == 'P'))
     {
