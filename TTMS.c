@@ -14,8 +14,10 @@
 #include "./View/Main_Menu.h"
 
 //系统运行入口函数main 
-int main(void) {
+int main(void) 
+{
 	setvbuf(stdout, NULL, _IONBF, 0);
-	Main_Menu();
+	Start();
+	//Main_Menu();
 	return EXIT_SUCCESS;
 }
