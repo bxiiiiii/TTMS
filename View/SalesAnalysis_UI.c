@@ -17,6 +17,7 @@ extern account_t gl_CurUser;
 static const int SALESANALYSIS_PAGE_SIZE = 5;
 
 //剧院销售排行榜函数,降序显示截止目前剧院电影票房排行榜
+
 void SalesAnalysis_UI_MgtEntry() {
 	int i;
 	char choice;
@@ -27,35 +28,44 @@ void SalesAnalysis_UI_MgtEntry() {
 
 	List_Init(head, salesanalysis_node_t);
 	paging.offset = 0;
-	paging.pageSize = SALESANALYSIS_PAGE_SIZE;
+	paging.pageSize = 5;
 
 	//载入数据
 	paging.totalRecords = SalesAnalysis_Srv_StaticSale(head);
-	SalesAnalysis_Srv_SortBySale(head);   //根据票房排序
+	//if(head == NULL)
+	//{
+	//	printf("HHHH\n");
+	//} 
+	//else
+	//{
+	//	printf("YYY\n"); 
+	//}
+	//SalesAnalysis_Srv_SortBySale(head);   //根据票房排序
 
 	Paging_Locate_FirstPage(head, paging);
 	do{
-		printf("\t\t\t=========================================================================\n");
-		printf("\t\t\t\t\t\t\t""票房图表\n");
-		printf("\t\t\t-------------------------------------------------------------------------\n");
-		printf("\t\t\t剧目名\t\t区域\t\t售票数\t票房\t上映时间\t\t下映时间\n");
+		system("cls"); 
+		printf("=========================================================================\n");
+		printf("================================票房图表=================================\n");
+		printf("-------------------------------------------------------------------------\n");
+		printf("剧目名\t\t出品地区\t售票数\t票房\t上映时间\t下映时间\n");
 
-			for (i = 0, pos = (salesanalysis_node_t *) (paging.curPos);
-				pos != head && i < paging.pageSize; i++) {
-			printf("\t\t\t%-10s\t%-10s\t%-5ld\t%-5ld\t%d-%d-%d\t%d-%d-%d\t\n",
+		Paging_ViewPage_ForEach(head, paging, play_node_t, pos, i)
+		{
+			//printf("AAA\n");
+			printf("%-10s\t%-10s\t%-5ld\t%-5ld\t%d-%d-%d\t%d-%d-%d\t\n",
 					pos->data.name, pos->data.area, pos->data.totaltickets,pos->data.sales,
 					pos->data.start_date.year,pos->data.start_date.month,pos->data.start_date.day,
 					pos->data.end_date.year,pos->data.end_date.month,pos->data.end_date.day);
-			pos = pos->next;
 		}
-		printf("\t\t\t---------- 共 %2d 项 --------------------------- 第 %2d/%2d 页 --------\n",
+		printf("--------------- 共 %2d 项 --------------------------- 第 %2d/%2d 页 --------\n",
 				paging.totalRecords, Pageing_CurPage(paging),
 				Pageing_TotalPages(paging));
-		printf("\t\t\t*************************************************************************\n");
-		printf("\t\t\t[P]上一页	|	[N]下一页	|	[R]返回\n");
-		printf("\n\t\t\t=========================================================================\n");
+		printf("*************************************************************************\n");
+		printf("[P]上一页	|	[N]下一页	|	[R]返回\n");
+		printf("=========================================================================\n");
 		fflush(stdin);
-		printf("\t\t\t请选择功能：");
+		printf("请选择功能：");
 		scanf("%c",&choice);
 
 		switch(choice)
