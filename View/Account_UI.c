@@ -1,40 +1,74 @@
 #include"Account_UI.h" 
 #include "../Service/Account.h"
+#include <stdio.h>
 #include "../Common/list.h"
-
 #include <unistd.h>
 #include <assert.h>
 #include <string.h>
-#include <stdio.h>
 #include <conio.h>
-
+#include <windows.h>
 extern account_t gl_CurUser;
 static const char ACCOUNT_KEY_NAME[]="Account";
 
+void color(short x)	//自定义函根据参数改变颜色 
+{
+    if (x >= 0 && x <= 15)//参数在0-15的范围颜色
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), x);	//只有一个参数，改变字体颜色 
+    else//默认的颜色白色
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
+}
 void Start()
 {
-	char choice;
-	do
-	{	
-		system("cls");
-		printf("河西村剧院\n");
-		printf("[A]登录\n");
-		printf("[B]注册\n");
-		printf("[C]退出\n");
-		printf("请输入你的选择：");
-
-		scanf("%c", &choice);
-	
-		if(choice == 'A' || choice == 'a')
-			SysLogin();
-		else if(choice == 'B' || choice == 'b')
-		{
-			account_list_t head;
-			head=(account_list_t)malloc(sizeof(account_node_t));
-			List_Init(head, account_node_t);
-			Account_UI_Add(head);
-		}
-	}while(!(choice == 'C' || choice == 'c'));
+    system("cls");
+    printf("\n\n\n\n\n\n\n\n");
+    color(10); printf("                                            河西村剧院\n");
+    color(12); printf("                                               登录\n");
+    color(7); printf("                                               退出\n");
+    int ch, a = 1;
+    while (1)
+    {
+        ch = getch();
+        system("cls");
+        if (ch == 80)
+            a++;
+        if (a > 2) a = 2;
+        if (ch == 72)
+            a--;
+        if (a < 1) a = 1;
+        printf("\n\n\n\n\n\n\n\n");
+        color(10); printf("                                            河西村剧院\n");
+        if (a == 1)
+        {
+            color(12); printf("                                               登录\n");
+        }
+        else
+        {
+            color(7); printf("                                               登录\n");
+        }
+        if (a == 2) {
+            color(12); printf("                                               退出\n");
+        }
+        else
+        {
+            color(7); printf("                                               退出\n");
+        }
+        
+        if (ch == 13)
+        {
+            if (a == 1)
+            {
+                SysLogin();
+            }
+            if (a == 2)
+            {
+               return;
+            }
+        }
+        if (ch == 27)
+        {
+            return;
+        }
+    }
 }
 
 int SysLogin()
@@ -47,17 +81,31 @@ int SysLogin()
 
 	int t,count=0,j=0;
 	char ch;
-	printf("请输入用户名：");
+	system("cls");
+	setbuf(stdin, NULL);
+	printf("\n\n\n\n\n\n\n\n请输入用户名：");
 	scanf("%s",name);
 
 	int i = 0;
 
 	while(1)
     {
+    	j=0;
+    	memset(passwd, 0, sizeof(passwd));
+		setbuf(stdin, NULL);
 		printf("请输入密码:");
 		while((ch=getch())!='\r')
 		{
 			passwd[j]=ch;
+			if(ch==27) 
+			{
+				system("cls");
+				    printf("\n\n\n\n\n\n\n\n");
+				    color(10); printf("                                            河西村剧院\n");
+				    color(12); printf("                                               登录\n");
+				    color(7); printf("                                               退出\n");
+				    return 0;
+			}
 			printf("*");
 			j=j+1;
 			if(j>=30)
@@ -71,7 +119,7 @@ int SysLogin()
 		}
 	
 		t=Account_Srv_Vertify(name,passwd);
-		printf("YYY%dYYY", t);
+		//printf("YYY%dYYY", t);
 		//Account_Perst_SelByName(name,&test);
 		if(t == 9)            //售票员 
 		{
@@ -138,6 +186,7 @@ void Account_UI_MgtEntry()
 
 	do {
 		//printf("XXXX\n");
+		system("cls");
 		printf("\n================================================================\n");
 		printf("********************** 系统用户信息 ****************************\n");
 		printf("%5s   %8s   %10s   %10s\n", "ID", "类型", "用户名","密码");
@@ -339,12 +388,14 @@ int Account_UI_Modify(account_list_t list,char userName[])
 		buf->data.id = key;
 		strcpy(buf->data.username,name);
 	
-		printf("****%d****\n", buf->data.type);
+		//printf("****%d****\n", buf->data.type);
 	
 		Account_Srv_Add(&buf->data);
 	
 		
 		List_AddTail(list,buf);
+		system("pause");
+		printf("按任意键继续...");
 		return 1;
 	}
  }
@@ -357,11 +408,14 @@ int Account_UI_Delete(account_list_t list ,char usrName[]) {
 	if(pos)
 	{
 		//printf("HHHHH\n");
-		if(Account_Srv_DeleteByID(pos->data.id))
-			printf("\t删除成功\n");
+		Account_Srv_DeleteByID(pos->data.id);
+		system("pause");
+		printf("按任意键继续...");
 		return 1;
 	}
 	printf("\t该账号不存在\n");
+	system("pause");
+	printf("按任意键继续...");
        	return  0;
 }
 //根据用户账号名查找该用户账号是否存在，存在返回1，否则返回0，并提示错误信息
@@ -383,9 +437,11 @@ int Account_UI_Query(account_list_t list,char usrName[])
 		printf("用户名----------%s\n",flag->data.username);
 		printf("密码------------%s\n",flag->data.password);
 		printf("用户类型---------%d\n",flag->data.type);
-		printf("\n\n");
+		system("pause");
+		printf("按任意键继续...");
 	
 	}
 	return 1;
 
 }
+ 
