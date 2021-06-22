@@ -36,11 +36,11 @@ void Play_UI_MgtEntry(void)
 		{
 			printf("=========================================================================================================\n");
 			printf("========================================剧目信息=========================================================\n");
-			printf("ID  名称                类型     出品地区          等级      时长      开映时间       结映时间       票价\n"); 
+			printf("ID   名称                类型     出品地区          等级      时长      开映时间       结映时间       票价\n"); 
 			printf("---------------------------------------------------------------------------------------------------------\n");
 			Paging_ViewPage_ForEach(head, paging, play_node_t, pos, i)
 			{
-				printf("%d  %-20s", pos->data.id, pos->data.name);
+				printf("%-4d%-20s", pos->data.id, pos->data.name);
 				switch(pos->data.type)
 				{
 					case 1:
@@ -195,7 +195,6 @@ int Play_UI_Add(void)
 	        if(data.rating <= 3 && data.rating >= 1)
 	        	break;
         }
-        scanf("%d", &data.rating);
 		printf("输入剧目时长(以分钟为单位,输入数字):");
 		scanf("%d",&data.duration); 
 		printf("输入开始放映日期(如2020 2 22):");
