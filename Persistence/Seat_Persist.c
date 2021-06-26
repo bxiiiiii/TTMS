@@ -1,13 +1,3 @@
-/*
-* Copyright(C), 2007-2008, XUPT Univ.
-* 用例编号：TTMS_UC_02	 
-* File name: Seat.h	  
-* Description : 设置座位用例持久化层	
-* Author:   XUPT  		 
-* Version:  v.1 	 
-* Date: 	2015年4月22日	
-*/
-
 #include "Seat_Persist.h"
 #include "../Service/Seat.h"
 #include "../Common/List.h"
@@ -129,11 +119,11 @@ int Seat_Perst_DeleteByID(int ID) {
 	fp1 = fopen("SeatTmp.dat", "rb");
 	fp2 = fopen("Seat.dat", "wb");
 
-	if(fp1 == NULL)
+/*	if(fp1 == NULL)
     {
         printf("文件Seat.dat打开失败\n");
         return -1;
-    }
+    }*/
 
 	while(!feof(fp1))
 	{
