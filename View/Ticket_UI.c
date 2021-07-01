@@ -20,10 +20,10 @@ void Ticket_UI_MgtEntry(int schedule_id)
 	Schedule_Srv_FetchByID_ticket(schedule_id,&buf);
 	Play_Srv_FetchByID(buf.play_id,&data);
 
-	printf( "=======================================================================\n");
+	printf( "====================================================================================\n");
 	
-	printf( "剧目名称          演出厅ID                日期                  时间       \n");
-	printf( "%s                 %d             %d.%d.%d               %d:%d:%d\n",data.name,buf.studio_id,buf.date.year,buf.date.month,buf.date.day,buf.time.hour,buf.time.minute,buf.time.second);
+	printf( "剧目名称          演出厅ID         日期                时间       \n");
+	printf( "%s                 %d             %d.%d.%d            %d:%d:\n",data.name,buf.studio_id,buf.date.year,buf.date.month,buf.date.day,buf.time.hour,buf.time.minute);
 
 	printf( "[G]生成票    [R]删除票 \n");
 	setbuf(stdin,NULL);
@@ -37,8 +37,8 @@ void Ticket_UI_MgtEntry(int schedule_id)
 		case'g':
 			system("cls");
 			Ticket_Srv_GenBatch(schedule_id);
-			system("pause"); 
 			printf("生成成功!\n");
+			system("pause"); 
 			break;
 		case'r':
 		case'R':
@@ -80,15 +80,27 @@ int Ticket_UI_ShowTicket(int ticket_id)
 	else
 	{
 		printf( "演出票ID      计划ID      座位ID     票价      票态    \n");
-		printf( "%6d  %6d     %6d    %6d   %6d    \n",buf.id,buf.schedule_id,buf.seat_id,buf.price,buf.status);
+		printf("================================================================\n");
+		printf( "%6d      %6d     %6d    %6d   ",buf.id,buf.schedule_id,buf.seat_id,buf.price);
+		switch(buf.status) 
+		{
+			case 0:
+				printf("     未售\n");
+				break;
+			case 1:
+				printf("     已售\n");
+				break;
+		}
 	}
+	system("pause");
+
 }
 
 void Ticket_UI_Print(const ticket_t data)
 {
 	printf("该票的信息为 : \n");
-	printf( "演出票ID      计划ID    座位ID  票价\n");
-	printf( "%d                  %d           %d      %d    \n",data.id,data.schedule_id,data.seat_id,data.price);
+	printf( "演出票ID    计划ID    座位ID  票价\n");
+	printf( "%d           %d        %d      %d    \n",data.id,data.schedule_id,data.seat_id,data.price);
 	printf( "---------------------------------------\n");
 	getchar( );
 }
