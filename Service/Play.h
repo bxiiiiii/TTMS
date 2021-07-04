@@ -23,4 +23,6 @@ int Play_Srv_Modify(const play_t *data);
 //函数功能：调用Play_Perst_RemByID删除剧目
 int Play_Srv_DelectByID(int id); 
 
+int Play_Srv_FetchByName(play_list_t list,char condt[]);
+
 #endif PLAY_H
